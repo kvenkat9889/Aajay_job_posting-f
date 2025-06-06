@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Application Form</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4bb543;
+            --error-color: #ff3333;
+            --warning-color: #ffcc00;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: var(--dark-color);
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+            position: relative;
+            z-index: 2;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .banner-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: moveCircles 15s infinite linear;
+        }
+
+        .circle:nth-child(1) {
+            width: 200px;
+            height: 200px;
+            top: -50px;
+            left: -50px;
+            animation-duration: 20s;
+        }
+
+        .circle:nth-child(2) {
+            width: 300px;
+            height: 300px;
+            bottom: -100px;
+            right: -100px;
+            animation-duration: 25s;
+            animation-direction: reverse;
+        }
+
+        .circle:nth-child(3) {
+            width: 150px;
+            height: 150px;
+            top: 50%;
+            left: 70%;
+            animation-duration: 15s;
+        }
+
+        @keyframes moveCircles {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(100px, 100px) rotate(360deg); }
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 40px;
+            background-color: white;
+            border-bottom: 1px solid #e9ecef;
+            position: relative;
+        }
+
+        .progress-steps::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 40px;
+            right: 40px;
+            height: 4px;
+            background-color: #e9ecef;
+            transform: translateY(-50%);
+            z-index: 1;
+        }
+
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 2;
+            position: relative;
+        }
+
+        .step-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #e9ecef;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            color: #6c757d;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+            border: 3px solid #e9ecef;
+        }
+
+        .step-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #6c757d;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .progress-step.active .step-icon {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .progress-step.active .step-label {
+            color: var(--primary-color);
+        }
+
+        .progress-step.completed .step-icon {
+            background-color: var(--success-color);
+            color: white;
+            border-color: var(--success-color);
+        }
+
+        .progress-step.completed .step-label {
+            color: var(--success-color);
+        }
+
+        .progress-bar {
+            position: absolute;
+            top: 50%;
+            left: 40px;
+            height: 4px;
+            background-color: var(--primary-color);
+            transform: translateY(-50%);
+            z-index: 1;
+            transition: width 0.4s ease;
+        }
+
+        .form-container {
+            padding: 30px;
+        }
+
+        .form-section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .required-field::after {
+            content: " *";
+            color: var(--error-color);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+            background-color: white;
+        }
+
+        input[type="file"] {
+            padding: 8px;
+        }
+
+        input[type="file"]::-webkit-file-upload-button {
+            padding: 8px 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        input[type="file"]::-webkit-file-upload-button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .has-error {
+            border-color: var(--error-color) !important;
+        }
+
+        .has-error:focus {
+            box-shadow: 0 0 0 3px rgba(255, 51, 51, 0.2) !important;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+        }
+
+        .btn-icon {
+            margin-right: 8px;
+        }
+
+        .success-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transform: translateY(0);
+            animation: modalIn 0.4s ease;
+        }
+
+        @keyframes modalIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-icon {
+            font-size: 60px;
+            color: var(--success-color);
+            margin-bottom: 20px;
+            animation: bounce 1s ease;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-20px); }
+            60% { transform: translateY(-10px); }
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--dark-color);
+        }
+
+        .modal-message {
+            font-size: 16px;
+            margin-bottom: 25px;
+            color: #6c757d;
+        }
+
+        .ref-id {
+            background-color: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin: 20px 0;
+            display: inline-block;
+        }
+
+        .modal-btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            margin-top: 20px;
+        }
+
+        .modal-btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .two-columns {
+                grid-template-columns: 1fr;
+            }
+            
+            .progress-steps {
+                padding: 15px 20px;
+            }
+            
+            .step-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+            
+            .step-label {
+                font-size: 12px;
+            }
+            
+            .form-container {
+                padding: 20px;
+            }
+        }
+
+        .joining-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .joining-option {
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+        }
+
+        .joining-option:hover {
+            border-color: var(--accent-color);
+        }
+
+        .joining-option.selected {
+            border-color: var(--primary-color);
+            background-color: rgba(67, 97, 238, 0.1);
+            font-weight: 600;
+        }
+
+        .joining-option input {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="banner-background">
+                <div class="circle"></div>
+                <div class="circle"></div>
+                <div class="circle"></div>
+            </div>
+            <h1>Job Application Form</h1>
+            <p>Complete your application to join our team</p>
+        </header>
+
+        <div class="progress-steps">
+            <div class="progress-bar" id="progressBar"></div>
+            <div class="progress-step completed" id="step1">
+                <div class="step-icon"><i class="fas fa-briefcase"></i></div>
+                <div class="step-label">Job Details</div>
+            </div>
+            <div class="progress-step" id="step2">
+                <div class="step-icon"><i class="fas fa-user"></i></div>
+                <div class="step-label">Personal Info</div>
+            </div>
+            <div class="progress-step" id="step3">
+                <div class="step-icon"><i class="fas fa-graduation-cap"></i></div>
+                <div class="step-label">Education</div>
+            </div>
+            <div class="progress-step" id="step4">
+                <div class="step-icon"><i class="fas fa-university"></i></div>
+                <div class="step-label">Higher Education</div>
+            </div>
+            <div class="progress-step" id="step5">
+                <div class="step-icon"><i class="fas fa-chart-line"></i></div>
+                <div class="step-label">Experience</div>
+            </div>
+        </div>
+
+        <div class="form-container">
+            <form id="offerLetterForm" enctype="multipart/form-data">
+                <!-- Section 1: Job Details -->
+                <div id="jobDetails" class="form-section active">
+                    <div class="two-columns">
+                        <div class="form-group">
+                            <label for="department" class="required-field">Department</label>
+                            <select id="department" name="department" required>
+                                <option value="" disabled selected>Select Department</option>
+                                <option value="HR">Human Resources (HR)</option>
+                                <option value="IT">Information Technology (IT)</option>
+                                <option value="Finance">Finance</option>
+                                <option value="Marketing">Marketing</option>
+                                <option value="Sales">Sales</option>
+                                <option value="Operations">Operations</option>
+                                <option value="Customer Support">Customer Support</option>
+                            </select>
+                            <div class="error-message" id="departmentError"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="jobRole" class="required-field">Job Role</label>
+                            <select id="jobRole" name="job_role" required>
+                                <option value="" disabled selected>Select Job Role</option>
+                                <option value="Software Developer">Software Developer</option>
+                                <option value="Web Developer">Web Developer</option>
+                                <option value="Backend Developer">Backend Developer</option>
+                                <option value="Software Tester">Software Tester</option>
+                                <option value="Java Developer">Java Developer</option>
+                                <option value="Python Developer">Python Developer</option>
+                                <option value="Cloud Engineer">Cloud Engineer</option>
+                                <option value="Data Scientist">Data Scientist</option>
+                                <option value="Business Analyst">Business Analyst</option>
+                                <option value="DevOps Engineer">DevOps Engineer</option>
+                                <option value="Machine Learning Engineer">Machine Learning Engineer</option>
+                                <option value="Project Manager">Project Manager</option>
+                                <option value="Full Stack Developer">Full Stack Developer</option>
+                            </select>
+                            <div class="error-message" id="jobRoleError"></div>
+                        </div>
+                    </div>
+
+                    <div class="two-columns">
+                        <div class="form-group">
+                            <label for="branchLocation" class="required-field">Branch Location</label>
+                            <select id="branchLocation" name="branch_location" required>
+                                <option value="" disabled selected>Select Branch Location</option>
+                                <option value="Pune">Pune</option>
+                                <option value="Bangalore">Bangalore</option>
+                                <option value="Hyderabad">Hyderabad</option>
+                            </select>
+                            <div class="error-message" id="branchLocationError"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="expectedSalary" class="required-field">Expected Salary (Per annum)</label>
+                            <input type="number" id="expectedSalary" name="expected_salary" placeholder="Enter amount in INR" required min="100000" step="10000">
+                            <div class="error-message" id="expectedSalaryError"></div>
+                        </div>
+                    </div>
+
+                    <div class="two-columns">
+                        <div class="form-group">
+                            <label for="employmentType" class="required-field">Employment Type</label>
+                            <select id="employmentType" name="employment_type" required>
+                                <option value="" disabled selected>Select Employment Type</option>
+                                <option value="Full-Time">Full-Time</option>
+                                <option value="Part-Time">Part-Time</option>
+                                <option value="Internship">Internship</option>
+                                <option value="Contract">Contract</option>
+                            </select>
+                            <div class="error-message" id="employmentTypeError"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="interviewDate" class="required-field">Interview Date</label>
+                            <input type="date" id="interviewDate" name="interview_date" required>
+                            <div class="error-message" id="interviewDateError"></div>
+                        </div>
+                    </div>
+
+                    <div class="two-columns">
+                        <div class="form-group">
+                            <label for="joiningDateOption" class="required-field">Expected Joining</label>
+                            <div class="joining-options" id="joiningDateOptions">
+                                <label class="joining-option">
+                                    <input type="radio" name="joining_option" value="immediate" required>
+                                    Immediate
+                                </label>
+                                <label class="joining-option">
+                                    <input type="radio" name="joining_option" value="30">
+                                    30 Days
+                                </label>
+                                <label class="joining-option">
+                                    <input type="radio" name="joining_option" value="45">
+                                    45 Days
+                                </label>
+                                <label class="joining-option">
+                                    <input type="radio" name="joining_option" value="60">
+                                    60 Days
+                                </label>
+                                <label class="joining-option">
+                                    <input type="radio" name="joining_option" value="90">
+                                    90 Days
+                                </label>
+                                <label class="joining-option">
+                                    <input type="radio" name="joining_option" value="custom">
+                                    Custom
+                                </label>
+                            </div>
+                            <div class="error-message" id="joiningOptionError"></div>
+                        </div>
+
+                        <div class="form-group" id="customJoiningDateContainer" style="display: none;">
+                            <label for="customJoiningDate" class="required-field">Custom Joining Date</label>
+                            <input type="date" id="customJoiningDate" name="joining_date">
+                            <div class="error-message" id="customJoiningDateError"></div>
+                        </div>
+                    </div>
+
+                    <div class="button-container">
+                        <div></div>
+                        <button type="button" class="btn btn-primary" onclick="nextSection()">
+                            <i class="fas fa-arrow-right btn-icon"></i> Next
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Section 2: Personal Info -->
+                <div id="personalInfo" class="form-section">
+                    <div class="two-columns">
+                        <div class="form-group">
+                            <label for="fullName" class="required-field">Full Name</label>
+                            <input type="text" id="fullName" name="full_name" placeholder="Enter your full name" required 
+                                   pattern="^(?!\s)(?!.*\s{2,})([A-Za-z]+(?: [A-Za-z]+)*[A-Za-z])$" 
+                                   minlength="3" maxlength="30"
+                                   title="Name cannot start with a space, no consecutive spaces allowed, maximum 8 spaces and 3 periods allowed.">
+                            <div class="error-message" id="fullNameError"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email" class="required-field">Email</label>
+                            <input type="email" id="email" name="email" placeholder="Enter your email" required
+                                   pattern="^[a-zA-Z0-9]{3,}@(gmail|outlook)\.(com|in|org|co)(\.[a-z]{2})?$"
+                                   title="Only Gmail or Outlook domains with .com, .in, .org, or .co extensions allowed">
+                            <div class="error-message" id="emailError"></div>
+                        </div>
+                    </div>
+
+                    <div class="two-columns">
+                        <div class="form-group">
+                            <label for="dob" class="required-field">Date of Birth</label>
+                            <input type="date" id="dob" name="dob" required>
+                            <div class="error-message" id="dobError"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="mobileNumber" class="required-field">Mobile Number</label>
+                            <input type="tel" id="mobileNumber" name="mobile_number" placeholder="Enter 10-digit mobile number" required
+                                   pattern="[6-9][0-9]{9}" maxlength="10">
+                            <div class="error-message" id="mobileNumberError"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fatherName" class="required-field">Father's Name</label>
+                        <input type="text" id="fatherName" name="father_name" placeholder="Enter father's name" required
+                               pattern="^(?!\s)(?!.*\s{2,})([A-Za-z]+(?: [A-Za-z]+)*[A-Za-z])$"
+                               minlength="3" maxlength="30"
+                               title="Name cannot start with a space, no consecutive spaces allowed, maximum 8 spaces and 3 periods allowed.">
+                        <div class="error-message" id="fatherNameError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="permanentAddress" class="required-field">Permanent Address</label>
+                        <textarea id="permanentAddress" name="permanent_address" rows="3" placeholder="Enter your permanent address" required
+                                  minlength="5" maxlength="80"></textarea>
+                        <div class="error-message" id="permanentAddressError"></div>
+                    </div>
+
+                    <div class="button-container">
+                        <button type="button" class="btn btn-secondary" onclick="prevSection()">
+                            <i class="fas fa-arrow-left btn-icon"></i> Previous
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="nextSection()">
+                            <i class="fas fa-arrow-right btn-icon"></i> Next
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Section 3: Education -->
+                <div id="educationDetails" class="form-section">
+                    <h3 style="margin-bottom: 20px; color: var(--primary-color);">Secondary Education (SSC)</h3>
+                    <div class="two-columns">
+                        <div class="form-group">
+                            <label for="sscYear" class="required-field">Year of Passing</label>
+                            <input type="number" id="sscYear" name="ssc_year" placeholder="Enter year" required min="1985" step="1">
+                            <div class="error-message" id="sscYearError"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="sscPercentage" class="required-field">Percentage</label>
+                            <input type="text" id="sscPercentage" name="ssc_percentage" placeholder="Enter percentage (e.g., 85.67)" required
+                                   pattern="^([1-9][0-9]?|100)(\.[0-9]{1,2})?$"
+                                   title="Percentage must be between 1 and 100 with up to 2 decimal places (e.g., 85, 85.5, 85.67)">
+                            <div class="error-message" id="sscPercentageError"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sscDoc" class="required-field">Upload SSC Marksheet (PDF only)</label>
+                        <input type="file" id="sscDoc" name="sscDoc" accept=".pdf" required>
+                        <div class="error-message" id="sscDocError"></div>
+                    </div>
+
+                    <h3 style="margin: 30px 0 20px 0; color: var(--primary-color);">Intermediate/Diploma</h3>
+                    <div class="two-columns">
+                        <div class="form-group">
+                            <label for="intermediateYear" class="required-field">Year of Passing</label>
+                            <input type="number" id="intermediateYear" name="intermediate_year" placeholder="Enter year" required min="1985" step="1">
+                            <div class="error-message" id="intermediateYearError"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="intermediatePercentage" class="required-field">Percentage</label>
+                            <input type="text" id="intermediatePercentage" name="intermediate_percentage" placeholder="Enter percentage (e.g., 85.67)" required
+                                   pattern="^([1-9][0-9]?|100)(\.[0-9]{1,2})?$"
+                                   title="Percentage must be between 1 and 100 with up to 2 decimal places (e.g., 85, 85.5, 85.67)">
+                            <div class="error-message" id="intermediatePercentageError"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="intermediateDoc" class="required-field">Upload Intermediate/Diploma Marksheet (PDF only)</label>
+                        <input type="file" id="intermediateDoc" name="intermediateDoc" accept=".pdf" required>
+                        <div class="error-message" id="intermediateDocError"></div>
+                    </div>
+
+                    <div class="button-container">
+                        <button type="button" class="btn btn-secondary" onclick="prevSection()">
+                            <i class="fas fa-arrow-left btn-icon"></i> Previous
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="nextSection()">
+                            <i class="fas fa-arrow-right btn-icon"></i> Next
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Section 4: Higher Education -->
+                <div id="higherEducation" class="form-section">
+                    <div class="two-columns">
+                        <div class="form-group">
+                            <label for="higherGraduation" class="required-field">College/University Name</label>
+                            <input type="text" id="higherGraduation" name="college_name" placeholder="Enter college/university name" required
+                                   pattern="^[A-Za-z]+(?: [A-Za-z]+)*$" minlength="5" maxlength="60"
+                                   title="Only alphabets and single spaces allowed, no leading or trailing spaces.">
+                            <div class="error-message" id="higherGraduationError"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="registerNumber" class="required-field">Registration Number</label>
+                            <input type="text" id="registerNumber" name="register_number" placeholder="Enter registration number" required
+                                   pattern="^[A-Za-z0-9]+$" minlength="5" maxlength="10"
+                                   title="Only alphanumeric characters allowed, no spaces.">
+                            <div class="error-message" id="registerNumberError"></div>
+                        </div>
+                    </div>
+
+                    <div class="two-columns">
+                        <div class="form-group">
+                            <label for="graduationYear" class="required-field">Year of Passing</label>
+                            <input type="number" id="graduationYear" name="graduation_year" placeholder="Enter year" required min="1985" step="1">
+                            <div class="error-message" id="graduationYearError"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="graduationPercentage" class="required-field">Percentage</label>
+                            <input type="text" id="graduationPercentage" name="graduation_percentage" placeholder="Enter percentage (e.g., 85.67)" required
+                                   pattern="^([1-9][0-9]?|100)(\.[0-9]{1,2})?$"
+                                   title="Percentage must be between 1 and 100 with up to 2 decimal places (e.g., 85, 85.5, 85.67)">
+                            <div class="error-message" id="graduationPercentageError"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="graduationDoc" class="required-field">Upload Graduation Document (PDF only)</label>
+                        <input type="file" id="graduationDoc" name="graduationDoc" accept=".pdf" required>
+                        <div class="error-message" id="graduationDocError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="additionalCertifications">Additional Certifications (if any)</label>
+                        <input type="text" id="additionalCertifications" name="additional_certifications" placeholder="Enter certification names"
+                               pattern="^[A-Za-z]+(?: [A-Za-z]+)*$" 
+                               title="Only alphabets and single spaces allowed, no leading or trailing spaces.">
+                        <div class="error-message" id="additionalCertificationsError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="additionalFiles">Upload Additional Documents (if any)</label>
+                        <input type="file" id="additionalFiles" name="additional_files" accept=".pdf">
+                        <div class="error-message" id="additionalFilesError"></div>
+                    </div>
+
+                    <div class="button-container">
+                        <button type="button" class="btn btn-secondary" onclick="prevSection()">
+                            <i class="fas fa-arrow-left btn-icon"></i> Previous
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="nextSection()">
+                            <i class="fas fa-arrow-right btn-icon"></i> Next
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Section 5: Experience -->
+                <div id="experienceDetails" class="form-section">
+                    <div class="form-group">
+                        <label for="experienceStatus" class="required-field">Are you an Experienced or Fresher?</label>
+                        <select id="experienceStatus" name="experience_status" required onchange="toggleExperienceFields()">
+                            <option value="" disabled selected>Select your experience status</option>
+                            <option value="fresher">Fresher</option>
+                            <option value="experienced">Experienced</option>
+                        </select>
+                        <div class="error-message" id="experienceStatusError"></div>
+                    </div>
+
+                    <div id="experienceFields" style="display: none;">
+                        <div class="two-columns">
+                            <div class="form-group">
+                                <label for="yearsOfExperience" class="required-field">Years of Experience</label>
+                                <input type="number" id="yearsOfExperience" name="years_of_experience" placeholder="Enter years of experience" min="1" max="40">
+                                <div class="error-message" id="yearsOfExperienceError"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="previousCompany" class="required-field">Previous Company Name</label>
+                                <input type="text" id="previousCompany" name="previous_company" placeholder="Enter company name"
+                                       pattern="^(?!\s)(?!.*\s{2,})([A-Za-z]+(?: [A-Za-z]+)*[A-Za-z])$" minlength="3" maxlength="45"
+                                       title="Only alphabets and single spaces allowed, no leading or trailing spaces.">
+                                <div class="error-message" id="previousCompanyError"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="previousJobRole" class="required-field">Previous Job Role</label>
+                            <select id="previousJobRole" name="previous_job_role">
+                                <option value="" disabled selected>Select your previous job role</option>
+                                <option value="Software Developer">Software Developer</option>
+                                <option value="Web Developer">Web Developer</option>
+                                <option value="Database Administrator">Database Administrator</option>
+                                <option value="Software Tester">Software Tester</option>
+                                <option value="System Administrator">System Administrator</option>
+                                <option value="Security Analyst">Security Analyst</option>
+                                <option value="Cloud Engineer">Cloud Engineer</option>
+                                <option value="Data Scientist">Data Scientist</option>
+                                <option value="Business Analyst">Business Analyst</option>
+                                <option value="DevOps Engineer">DevOps Engineer</option>
+                                <option value="Machine Learning Engineer">Machine Learning Engineer</option>
+                                <option value="Project Manager">Project Manager</option>
+                                <option value="Full Stack Developer">Full Stack Developer</option>
+                            </select>
+                            <div class="error-message" id="previousJobRoleError"></div>
+                        </div>
+                    </div>
+
+                    <div class="button-container">
+                        <button type="button" class="btn btn-secondary" onclick="prevSection()">
+                            <i class="fas fa-arrow-left btn-icon"></i> Previous
+                        </button>
+                        <button type="submit" id="submitBtn" class="btn btn-primary">
+                            <i class="fas fa-paper-plane btn-icon"></i> Submit Application
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="success-modal" id="successModal">
+        <div class="modal-content">
+            <div class="modal-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2 class="modal-title">Application Submitted Successfully!</h2>
+            <p class="modal-message">Thank you for applying. We will review your application and get back to you soon.</p>
+            <div class="ref-id" id="refIdDisplay"></div>
+            <button class="modal-btn" onclick="closeModal()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentSection = 0;
+        let isSubmitting = false;
+        const sections = document.querySelectorAll('.form-section');
+        const steps = document.querySelectorAll('.progress-step');
+        const progressBar = document.getElementById('progressBar');
+        const joiningDateOptions = document.querySelectorAll('.joining-option');
+        const successModal = document.getElementById('successModal');
+        const refIdDisplay = document.getElementById('refIdDisplay');
+        const BASE_URL = 'http://54.166.206.245:3222';
+
+        // Initialize form
+        document.addEventListener('DOMContentLoaded', function() {
+            setDateConstraints();
+            initJoiningDateOptions();
+            initFormValidation();
+            updateProgressBar();
+            showSection(currentSection);
+            restrictYearInputs();
+            restrictSalaryInput();
+            restrictExperienceInput();
+        });
+
+        // Navigation functions
+        function nextSection() {
+            if (validateCurrentSection()) {
+                if (currentSection < sections.length - 1) {
+                    currentSection++;
+                    showSection(currentSection);
+                    updateProgressSteps();
+                    updateProgressBar();
+                }
+            }
+        }
+
+        function prevSection() {
+            if (currentSection > 0) {
+                currentSection--;
+                showSection(currentSection);
+                updateProgressSteps();
+                updateProgressBar();
+            }
+        }
+
+        function showSection(index) {
+            sections.forEach((section, i) => {
+                section.classList.toggle('active', i === index);
+            });
+        }
+
+        // Progress tracking functions
+        function updateProgressSteps() {
+            steps.forEach((step, index) => {
+                if (index < currentSection) {
+                    step.classList.add('completed');
+                    step.classList.remove('active');
+                } else if (index === currentSection) {
+                    step.classList.add('active');
+                    step.classList.remove('completed');
+                } else {
+                    step.classList.remove('active', 'completed');
+                }
+            });
+        }
+
+        function updateProgressBar() {
+            const progressPercentage = (currentSection / (sections.length - 1)) * 100;
+            progressBar.style.width = `${progressPercentage}%`;
+        }
+
+        // Joining date options
+        function initJoiningDateOptions() {
+            joiningDateOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    joiningDateOptions.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    const value = this.querySelector('input').value;
+                    const customContainer = document.getElementById('customJoiningDateContainer');
+                    customContainer.style.display = value === 'custom' ? 'block' : 'none';
+                    
+                    // Clear custom date if another option is selected
+                    if (value !== 'custom') {
+                        document.getElementById('customJoiningDate').value = '';
+                    }
+                });
+            });
+        }
+
+        // Form validation
+        function initFormValidation() {
+            document.querySelectorAll('input, select, textarea').forEach(input => {
+                input.addEventListener('input', function() {
+                    validateInput(this);
+                });
+                input.addEventListener('blur', function() {
+                    validateInput(this);
+                });
+            });
+
+            document.querySelectorAll('input[type="file"]').forEach(input => {
+                input.addEventListener('change', function() {
+                    validateFileInput(this);
+                });
+            });
+
+            document.getElementById('offerLetterForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                if (validateCurrentSection() && validateAllSections()) {
+                    submitForm();
+                } else {
+                    const firstError = document.querySelector('.has-error');
+                    if (firstError) {
+                        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+            });
+        }
+
+        function validateCurrentSection() {
+            let isValid = true;
+            const currentSectionElement = sections[currentSection];
+            const inputs = currentSectionElement.querySelectorAll('input[required], select[required], textarea[required]');
+            
+            inputs.forEach(input => {
+                if (!validateInput(input)) {
+                    isValid = false;
+                }
+            });
+
+            if (currentSection === 0) {
+                const joiningOptionSelected = document.querySelector('input[name="joining_option"]:checked');
+                if (!joiningOptionSelected) {
+                    document.getElementById('joiningOptionError').textContent = 'Please select a joining option';
+                    document.getElementById('joiningOptionError').style.display = 'block';
+                    isValid = false;
+                } else if (joiningOptionSelected.value === 'custom') {
+                    const customDate = document.getElementById('customJoiningDate').value;
+                    if (!customDate) {
+                        document.getElementById('customJoiningDateError').textContent = 'Please select a custom joining date';
+                        document.getElementById('customJoiningDateError').style.display = 'block';
+                        document.getElementById('customJoiningDate').classList.add('has-error');
+                        isValid = false;
+                    }
+                }
+            }
+
+            return isValid;
+        }
+
+        function validateAllSections() {
+            let isValid = true;
+            sections.forEach((section, index) => {
+                const inputs = section.querySelectorAll('input[required], select[required], textarea[required]');
+                inputs.forEach(input => {
+                    if (!validateInput(input)) {
+                        if (index !== currentSection) {
+                            currentSection = index;
+                            showSection(currentSection);
+                            updateProgressSteps();
+                            updateProgressBar();
+                        }
+                        isValid = false;
+                    }
+                });
+            });
+            return isValid;
+        }
+
+        function validateInput(input) {
+            const errorElement = document.getElementById(`${input.id}Error`);
+            input.classList.remove('has-error');
+            if (errorElement) {
+                errorElement.style.display = 'none';
+            }
+            if (input.offsetParent === null) return true;
+            if (input.required && !input.value.trim()) {
+                showError(input, errorElement, 'This field is required');
+                return false;
+            }
+
+            switch (input.type) {
+                case 'email':
+                    if (!validateEmail(input.value)) {
+                        showError(input, errorElement, 'Please enter a valid email (Gmail/Outlook with .com/.in/.org/.co)');
+                        return false;
+                    }
+                    break;
+                case 'tel':
+                    if (!validatePhone(input.value)) {
+                        showError(input, errorElement, 'Mobile number must start with 6, 7, 8, or 9 and be 10 digits!');
+                        return false;
+                    }
+                    break;
+                case 'number':
+                    if (input.id === 'expectedSalary') {
+                        const salary = parseInt(input.value);
+                        if (isNaN(salary) || salary < 100000) {
+                            showError(input, errorElement, 'Salary must be at least ₹1,00,000!');
+                            return false;
+                        } else if (salary > 99999999) {
+                            showError(input, errorElement, 'Salary cannot be more than ₹9,99,99,999!');
+                            return false;
+                        }
+                    }
+                    if (input.id === 'sscYear' || input.id === 'intermediateYear' || input.id === 'graduationYear') {
+                        if (!validateYearInput(input)) {
+                            return false;
+                        }
+                    }
+                    if (input.id === 'yearsOfExperience') {
+                        const value = parseInt(input.value);
+                        if (isNaN(value) || value < 1 || value > 40) {
+                            showError(input, errorElement, 'Experience must be between 1 and 40 years');
+                            return false;
+                        }
+                    }
+                    break;
+                case 'date':
+                    if (input.id === 'dob' && !validateDOB(input.value)) {
+                        showError(input, errorElement, 'Age must be between 20 and 60 years');
+                        return false;
+                    }
+                    if (input.id === 'customJoiningDate' && !validateJoiningDate(input.value)) {
+                        showError(input, errorElement, 'Joining date must be within 4 months from today');
+                        return false;
+                    }
+                    if (input.id === 'interviewDate' && !validateInterviewDate(input.value)) {
+                        showError(input, errorElement, 'Interview date must be within 6 months before today');
+                        return false;
+                    }
+                    break;
+                case 'text':
+                case 'textarea':
+                    if (input.id === 'fullName' || input.id === 'fatherName' || input.id === 'previousCompany') {
+                        if (!validateName(input.value)) {
+                            showError(input, errorElement, input.title || 'Invalid format');
+                            return false;
+                        }
+                    }
+                    if (input.id === 'higherGraduation' || input.id === 'additionalCertifications') {
+                        if (input.value && !/^[A-Za-z]+(?: [A-Za-z]+)*$/.test(input.value)) {
+                            showError(input, errorElement, input.title || 'Invalid format');
+                            return false;
+                        }
+                    }
+                    if (input.id === 'registerNumber' && !/^[A-Za-z0-9]+$/.test(input.value)) {
+                        showError(input, errorElement, 'Only alphanumeric characters allowed, no spaces');
+                        return false;
+                    }
+                    if (input.id === 'permanentAddress') {
+                        if (!validatePermanentAddress(input.value)) {
+                            showError(input, errorElement, 'Invalid address format!');
+                            return false;
+                        }
+                    }
+                    if (input.id === 'sscPercentage' || input.id === 'intermediatePercentage' || input.id === 'graduationPercentage') {
+                        if (!/^([1-9][0-9]?|100)(\.[0-9]{1,2})?$/.test(input.value)) {
+                            showError(input, errorElement, 'Percentage must be between 1 and 100 with up to 2 decimal places (e.g., 85, 85.5, 85.67)');
+                            return false;
+                        }
+                    }
+                    break;
+            }
+
+            if (input.pattern && !new RegExp(input.pattern).test(input.value)) {
+                showError(input, errorElement, input.title || 'Invalid format');
+                return false;
+            }
+            return true;
+        }
+
+        function validateFileInput(input) {
+            const errorElement = document.getElementById(`${input.id}Error`);
+            input.classList.remove('has-error');
+            if (errorElement) {
+                errorElement.style.display = 'none';
+            }
+            if (input.required && !input.files.length) {
+                showError(input, errorElement, 'This file is required');
+                return false;
+            }
+            if (input.files.length) {
+                const file = input.files[0];
+                const validTypes = ['application/pdf'];
+                const maxSize = 5 * 1024 * 1024;
+                if (!validTypes.includes(file.type)) {
+                    showError(input, errorElement, 'Only PDF files are allowed');
+                    return false;
+                }
+                if (file.size > maxSize) {
+                    showError(input, errorElement, 'File size must be less than 5MB');
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function showError(input, errorElement, message) {
+            input.classList.add('has-error');
+            if (errorElement) {
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+            }
+        }
+
+        function validateEmail(email) {
+            return /^[a-zA-Z0-9]{3,}@(gmail|outlook)\.(com|in|org|co)(\.[a-z]{2})?$/.test(email);
+        }
+
+        function validatePhone(phone) {
+            return /^[6-9]\d{9}$/.test(phone);
+        }
+
+        function validateName(name) {
+            return /^(?!\s)(?!.*\s{2,})([A-Za-z]+(?: [A-Za-z]+)*[A-Za-z])$/.test(name);
+        }
+
+        function validatePermanentAddress(value) {
+            const regex = /^[a-zA-Z0-9]+(?:(?:[,\-\/:.][a-zA-Z0-9]*)|(?:\s[a-zA-Z0-9]+))*[a-zA-Z0-9]$/;
+            return regex.test(value);
+        }
+
+        function validateYearInput(input) {
+            const value = parseInt(input.value);
+            const currentYear = new Date().getFullYear();
+
+            if (isNaN(value) || value < 1985 || value > currentYear) {
+                showError(input, document.getElementById(`${input.id}Error`), `Year must be between 1985 and ${currentYear}.`);
+                return false;
+            }
+
+            const sscYear = document.getElementById("sscYear").value;
+            const interYear = document.getElementById("intermediateYear").value;
+            const gradYear = document.getElementById("graduationYear").value;
+
+            if (input.id === "intermediateYear" && sscYear && value <= parseInt(sscYear) + 1) {
+                showError(input, document.getElementById(`${input.id}Error`), "Intermediate year must be at least 2 years after SSC year.");
+                return false;
+            }
+
+            if (input.id === "graduationYear" && interYear && value <= parseInt(interYear) + 2) {
+                showError(input, document.getElementById(`${input.id}Error`), "Graduation year must be at least 3 years after Intermediate year.");
+                return false;
+            }
+
+            return true;
+        }
+
+        function restrictYearInputs() {
+            const yearInputs = document.querySelectorAll('input[id="sscYear"], input[id="intermediateYear"], input[id="graduationYear"]');
+
+            yearInputs.forEach(input => {
+                input.addEventListener('keydown', (e) => {
+                    if (!/[0-9]|Backspace|ArrowLeft|ArrowRight|ArrowUp|ArrowDown/.test(e.key)) {
+                        e.preventDefault();
+                    }
+                });
+
+                input.addEventListener('input', (e) => {
+                    if (input.value.length > 4) {
+                        input.value = input.value.slice(0, 4);
+                    }
+                    validateInput(input);
+                });
+            });
+        }
+
+        function restrictSalaryInput() {
+            const salaryInput = document.getElementById('expectedSalary');
+
+            if (salaryInput) {
+                salaryInput.addEventListener('input', (e) => {
+                    let value = salaryInput.value.replace(/\D/g, '');
+                    if (value.length > 8) {
+                        value = value.slice(0, 8);
+                    }
+                    salaryInput.value = value;
+                    validateInput(salaryInput);
+                });
+            }
+        }
+
+        function restrictExperienceInput() {
+            const experienceInput = document.getElementById('yearsOfExperience');
+
+            if (experienceInput) {
+                experienceInput.addEventListener('input', (e) => {
+                    let value = experienceInput.value.replace(/\D/g, '');
+                    if (value.length > 2) {
+                        value = value.slice(0, 2);
+                    }
+                    experienceInput.value = value;
+                    validateInput(experienceInput);
+                });
+            }
+        }
+
+        function validateDOB(dob) {
+            if (!dob) return false;
+            const birthDate = new Date(dob);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            return age >= 20 && age <= 60;
+        }
+
+        function validateJoiningDate(date) {
+            if (!date) return false;
+            const joiningDate = new Date(date);
+            const today = new Date();
+            const fourMonthsLater = new Date();
+            fourMonthsLater.setMonth(today.getMonth() + 4);
+            return joiningDate >= today && joiningDate <= fourMonthsLater;
+        }
+
+        function validateInterviewDate(date) {
+            if (!date) return false;
+            const interviewDate = new Date(date);
+            const today = new Date();
+            const sixMonthsEarlier = new Date();
+            sixMonthsEarlier.setMonth(today.getMonth() - 6);
+            return interviewDate >= sixMonthsEarlier && interviewDate <= today;
+        }
+
+        function setDateConstraints() {
+            const today = new Date();
+            const formatDate = (date) => date.toISOString().split('T')[0];
+
+            // DOB: 20-60 years old
+            const minDOB = new Date();
+            minDOB.setFullYear(today.getFullYear() - 60);
+            const maxDOB = new Date();
+            maxDOB.setFullYear(today.getFullYear() - 20);
+            document.getElementById('dob').setAttribute('max', formatDate(maxDOB));
+            document.getElementById('dob').setAttribute('min', formatDate(minDOB));
+
+            // Interview date: Up to 6 months ago
+            const minInterviewDate = new Date();
+            minInterviewDate.setMonth(today.getMonth() - 6);
+            document.getElementById('interviewDate').setAttribute('max', formatDate(today));
+            document.getElementById('interviewDate').setAttribute('min', formatDate(minInterviewDate));
+
+            // Joining date: Up to 4 months in future
+            const maxJoiningDate = new Date();
+            maxJoiningDate.setMonth(today.getMonth() + 4);
+            document.getElementById('customJoiningDate').setAttribute('min', formatDate(today));
+            document.getElementById('customJoiningDate').setAttribute('max', formatDate(maxJoiningDate));
+        }
+
+        function toggleExperienceFields() {
+            const experienceStatus = document.getElementById('experienceStatus');
+            const experienceFields = document.getElementById('experienceFields');
+            if (experienceStatus.value === 'experienced') {
+                experienceFields.style.display = 'block';
+                document.getElementById('yearsOfExperience').required = true;
+                document.getElementById('previousCompany').required = true;
+                document.getElementById('previousJobRole').required = true;
+            } else {
+                experienceFields.style.display = 'none';
+                document.getElementById('yearsOfExperience').required = false;
+                document.getElementById('previousCompany').required = false;
+                document.getElementById('previousJobRole').required = false;
+                
+                // Clear experience fields when switching to fresher
+                document.getElementById('yearsOfExperience').value = '';
+                document.getElementById('previousCompany').value = '';
+                document.getElementById('previousJobRole').value = '';
+            }
+        }
+
+        async function submitForm() {
+            if (isSubmitting) return;
+            isSubmitting = true;
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+
+            const form = document.getElementById('offerLetterForm');
+            const formData = new FormData(form);
+
+            // Calculate joining date based on selection
+            const joiningOption = document.querySelector('input[name="joining_option"]:checked')?.value;
+            if (joiningOption) {
+                let joiningDate = new Date();
+                if (joiningOption === 'custom') {
+                    joiningDate = new Date(document.getElementById('customJoiningDate').value);
+                } else if (joiningOption !== 'immediate') {
+                    joiningDate.setDate(joiningDate.getDate() + parseInt(joiningOption));
+                }
+                formData.set('joining_date', joiningDate.toISOString().split('T')[0]);
+            }
+
+            try {
+                const response = await fetch(`${BASE_URL}/api/applications`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(errorText || 'Failed to submit application');
+                }
+
+                const result = await response.json();
+                if (!result.success) {
+                    throw new Error(result.message || 'Application submission failed');
+                }
+
+                showSuccessModal(result.reference_id);
+            } catch (error) {
+                console.error('Submission error:', error);
+                
+                let errorMessage = 'Failed to submit application';
+                if (error.message.includes('Email already exists')) {
+                    errorMessage = 'This email is already registered';
+                    document.getElementById('email').classList.add('has-error');
+                    document.getElementById('emailError').textContent = errorMessage;
+                    document.getElementById('emailError').style.display = 'block';
+                    currentSection = 1;
+                    showSection(currentSection);
+                    updateProgressSteps();
+                    updateProgressBar();
+                } else if (error.message.includes('Mobile number already exists')) {
+                    errorMessage = 'This mobile number is already registered';
+                    document.getElementById('mobileNumber').classList.add('has-error');
+                    document.getElementById('mobileNumberError').textContent = errorMessage;
+                    document.getElementById('mobileNumberError').style.display = 'block';
+                    currentSection = 1;
+                    showSection(currentSection);
+                    updateProgressSteps();
+                    updateProgressBar();
+                } else {
+                    alert(`Error: ${error.message || 'Failed to submit application'}`);
+                }
+            } finally {
+                isSubmitting = false;
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Application';
+            }
+        }
+
+        function showSuccessModal(refId) {
+            refIdDisplay.textContent = refId;
+            successModal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            successModal.style.display = 'none';
+            document.getElementById('offerLetterForm').reset();
+            currentSection = 0;
+            showSection(currentSection);
+            updateProgressSteps();
+            updateProgressBar();
+            document.querySelectorAll('.joining-option').forEach(opt => opt.classList.remove('selected'));
+            document.getElementById('customJoiningDateContainer').style.display = 'none';
+            
+            // Reset experience fields
+            document.getElementById('experienceStatus').value = '';
+            toggleExperienceFields();
+        }
+    </script>
+</body>
+</html>

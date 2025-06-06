@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR Dashboard - Job Applications</title>
+    <!-- Tailwind CSS via CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- SweetAlert2 for Modals -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="icon" type="image/png" href="https://favicon.io/favicon-16x16.png">
+    <style>
+        /* Custom styles for animations and overrides */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Ensure table is scrollable on small screens */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        /* Custom modal styles */
+        .modal-content {
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        /* Gradient button */
+        .gradient-button {
+            background: linear-gradient(to right, #3B82F6, #7C3AED);
+            transition: background 0.3s;
+        }
+
+        .gradient-button:hover {
+            background: linear-gradient(to right, #2563EB, #6D28D9);
+        }
+
+        /* Truncate long text */
+        .truncate-cell {
+            max-width: 150px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Modal close button */
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            color: #6b7280;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .modal-close:hover {
+            color: #374151;
+        }
+    </style>
+</head>
+<body class="bg-white-100 min-h-screen">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-purple-600 to-blue-500 text-white py-6 text-center shadow-lg">
+        <h1 class="text-3xl font-bold">HR Dashboard</h1>
+        <p class="text-lg mt-2">Manage Job Applications and provide offerLetter</p>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container mx-auto p-6">
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-white p-4 rounded-lg shadow-md cursor-pointer hover:bg-gray-50 transition" onclick="showSection('pending')">
+                <h3 class="text-lg font-semibold text-gray-700"><i class="fas fa-briefcase mr-2"></i>Pending</h3>
+                <p class="text-2xl font-bold text-yellow-500" id="pendingCount">0</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-md cursor-pointer hover:bg-gray-50 transition" onclick="showSection('approved')">
+                <h3 class="text-lg font-semibold text-gray-700"><i class="fas fa-check-circle mr-2"></i>Approved</h3>
+                <p class="text-2xl font-bold text-green-500" id="approvedCount">0</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-md cursor-pointer hover:bg-gray-50 transition" onclick="showSection('rejected')">
+                <h3 class="text-lg font-semibold text-gray-700"><i class="fas fa-times-circle mr-2"></i>Rejected</h3>
+                <p class="text-2xl font-bold text-red-500" id="rejectedCount">0</p>
+            </div>
+        </div>
+
+        <!-- Filters and Search -->
+        <div class="bg-white p-4 rounded-lg shadow-md mb-6">
+            <div class="flex flex-col md:flex-row gap-4">
+                <div class="flex-1">
+                    <input type="text" id="searchInput" class="w-full p-2 border rounded-lg" placeholder="Search by Reference ID, Name, or Email">
+                </div>
+                <div class="flex-1">
+                    <select id="departmentFilter" class="w-full p-2 border rounded-lg">
+                        <option value="">All Departments</option>
+                    </select>
+                </div>
+                <div class="flex-1">
+                    <select id="jobRoleFilter" class="w-full p-2 border rounded-lg">
+                        <option value="">All Job Roles</option>
+                    </select>
+                </div>
+                <button class="gradient-button text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition" onclick="applyFilters()">
+                    Apply Filters
+                </button>
+            </div>
+        </div>
+
+        <!-- Sections -->
+        <div id="pendingSection" class="dashboard bg-white p-6 rounded-lg shadow-md hidden fade-in">
+            <h2 class="text-xl font-semibold mb-4"><i class="fas fa-briefcase mr-2"></i>Pending Applications</h2>
+            <div class="table-container">
+                <table class="w-full border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50">
+                            <th class="p-3 text-left text-gray-600 font-semibold">Reference ID</th>
+                            <th class="p-3 text-left text-gray-600 font-semibold">Full Name</th>
+                            <th class="p-3 text-left text-gray-600 font-semibold">Email</th>
+                            <th class="p-3 text-left text-gray-600 font-semibold">Mobile Number</th>
+                            <th class="p-3 text-left text-gray-600 font-semibold">Department</th>
+                            <th class="p-3 text-left text-gray-600 font-semibold">Job Role</th>
+                            <th class="p-3 text-left text-gray-600 font-semibold">Status</th>
+                            <th class="p-3 text-left text-gray-600 font-semibold">Applied On</th>
+                            <th class="p-3 text-left text-gray-600 font-semibold">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pendingApplicationsBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="approvedSection" class="dashboard bg-white p-6 rounded-lg shadow-md hidden fade-in">
+            <h2 class="text-xl font-semibold mb-4"><i class="fas fa-check-circle mr-2"></i>Approved Applications</h2>
+            <div class="table-container">
+                <table class="w-full border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50">
+                            <th class="p-3 text-left text-gray-600 font-semibold">Reference ID</th>
+                            <th class="p-3 text-left text-gray-600 font-semibold">Full Name</th>
+                            <th class="p-3 text-left text-gray-600 font-semibold">Email</th>
+                            <th class="p-3 text-left text-gray-600 font-semibold">Mobile Number</th>
+                            <th class="p-3 text-left text-gray-600 font-semibold">Department</th>
+                            <th class="p-3 text-left text-gray-600 font-semibold">Job Role</th>
+                            <th class="p-3 text-left text-gray-600 font-semibold">Status</th>
+                            <th class="p-3 text-left text-gray-600 font-semibold">Offer Letter</th>
+                            <th class="p-3 text-left text-gray-600 font-semibold">Applied On</th>
+                            <th class="p-3 text-left text-gray-600 font-semibold">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="approvedApplicationsBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="rejectedSection" class="dashboard bg-white p-6 rounded-lg shadow-md hidden fade-in">
+            <h2 class="text-xl font-semibold mb-4"><i class="fas fa-times-circle mr-2"></i>Rejected Applications</h2>
+            <div class="table-container">
+                <table class="w-full border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50">
+                            <th class="p-3 text-left text-gray-600 font-semibold">Reference ID</th>
+                            <th class="p-3 text-left text-gray-600 font-semibold">Full Name</th>
+                            <th class="p-3 text-left text-gray-600 font-semibold">Email</th>
+                            <th class="p-3 text-left text-gray-600 font-semibold">Mobile Number</th>
+                            <th class="p-3 text-left text-gray-600 font-semibold">Department</th>
+                            <th class="p-3 text-left text-gray-600 font-semibold">Job Role</th>
+                            <th class="p-3 text-left text-gray-600 font-semibold">Status</th>
+                            <th class="p-3 text-left text-gray-600 font-semibold">Applied On</th>
+                            <th class="p-3 text-left text-gray-600 font-semibold">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rejectedApplicationsBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Modal -->
+    <div id="detailsModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-lg shadow-lg max-w-2xl w-full modal-content relative">
+            <span class="modal-close" onclick="closeModal()">×</span>
+            <h2 class="text-xl font-semibold mb-4">Application Details</h2>
+            <div id="applicationDetails" class="mb-4"></div>
+            <div class="download-section">
+                <h3 class="text-lg font-semibold mb-2">Documents</h3>
+                <div id="documentLinks" class="mb-4"></div>
+            </div>
+            <div class="status-section" id="statusSection">
+                <h3 class="text-lg font-semibold mb-2">Update Status</h3>
+                <select id="statusSelect" class="p-2 border rounded-lg">
+                    <option value="Pending">Pending</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Rejected">Rejected</option>
+                </select>
+                <button class="gradient-button text-white px-4 py-2 rounded-lg ml-4" onclick="confirmStatusUpdate()">Update</button>
+            </div>
+            <div class="offer-letter-section mt-4" id="offerLetterUploadSection" style="display: none;">
+                <h3 class="text-lg font-semibold mb-2">Upload Offer Letter</h3>
+                <input type="file" id="offerLetterInput" accept=".pdf" class="mb-2">
+                <button class="gradient-button text-white px-4 py-2 rounded-lg" onclick="uploadOfferLetter()">Upload</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = 'http://54.166.206.245:3222';
+        let currentApplicationId = null;
+        let applicationsData = [];
+        let currentSection = 'pending';
+
+        window.onload = () => {
+            fetchApplications();
+        };
+
+        async function fetchApplications() {
+            try {
+                console.log('Fetching applications from:', `${BASE_URL}/api/applications`);
+                const response = await fetch(`${BASE_URL}/api/applications`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                console.log('Fetch response status:', response.status, response.statusText);
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Fetch error response:', errorText);
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+                const result = await response.json();
+                console.log('Parsed server response:', result);
+                if (!result.success) throw new Error(result.message);
+                applicationsData = result.data;
+                applicationsData.forEach(app => {
+                    console.log(`Application ID ${app.id}: referenceId=${app.reference_id}, status=${app.status}, offer_letter_path=${app.offer_letter_path}`);
+                });
+                populateFilters();
+                applyFilters();
+                updateCounts();
+                showSection(currentSection);
+            } catch (error) {
+                console.error('Fetch applications error:', error);
+                let errorMessage = error.message.includes('Failed to fetch')
+                    ? 'Unable to connect to the server at http://54.166.206.245:3222. Please ensure the server is running.'
+                    : error.message.includes('CORS')
+                    ? 'CORS error: Please ensure the server allows requests from this origin.'
+                    : error.message;
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error Fetching Applications',
+                    text: errorMessage
+                });
+                applicationsData = [];
+                updateCounts();
+                showSection(currentSection);
+            }
+        }
+
+        function updateCounts() {
+            const pendingCount = applicationsData.filter(app => app.status === 'Pending').length;
+            const approvedCount = applicationsData.filter(app => app.status === 'Approved').length;
+            const rejectedCount = applicationsData.filter(app => app.status === 'Rejected').length;
+
+            console.log(`Counts - Pending: ${pendingCount}, Approved: ${approvedCount}, Rejected: ${rejectedCount}`);
+
+            document.getElementById('pendingCount').textContent = pendingCount;
+            document.getElementById('approvedCount').textContent = approvedCount;
+            document.getElementById('rejectedCount').textContent = rejectedCount;
+        }
+
+        function populateFilters() {
+            const departments = [...new Set(applicationsData.map(app => app.department).filter(Boolean))];
+            const jobRoles = [...new Set(applicationsData.map(app => app.job_role).filter(Boolean))];
+
+            const departmentFilter = document.getElementById('departmentFilter');
+            const jobRoleFilter = document.getElementById('jobRoleFilter');
+
+            // Clear existing options except the default
+            departmentFilter.innerHTML = '<option value="">All Departments</option>';
+            jobRoleFilter.innerHTML = '<option value="">All Job Roles</option>';
+
+            departments.forEach(dept => {
+                const option = document.createElement('option');
+                option.value = dept;
+                option.textContent = dept;
+                departmentFilter.appendChild(option);
+            });
+
+            jobRoles.forEach(role => {
+                const option = document.createElement('option');
+                option.value = role;
+                option.textContent = role;
+                jobRoleFilter.appendChild(option);
+            });
+        }
+
+        function applyFilters() {
+            const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+            const departmentFilter = document.getElementById('departmentFilter').value;
+            const jobRoleFilter = document.getElementById('jobRoleFilter').value;
+
+            const filteredData = applicationsData.filter(app => {
+                const matchesSearch = !searchQuery || 
+                    (app.reference_id?.toLowerCase().includes(searchQuery) ||
+                     app.full_name?.toLowerCase().includes(searchQuery) ||
+                     app.email?.toLowerCase().includes(searchQuery));
+                const matchesDepartment = !departmentFilter || app.department === departmentFilter;
+                const matchesJobRole = !jobRoleFilter || app.job_role === jobRoleFilter;
+                return matchesSearch && matchesDepartment && matchesJobRole;
+            });
+
+            console.log('Filtered applications:', filteredData);
+            displayApplications(filteredData);
+        }
+
+        function showSection(section) {
+            currentSection = section;
+            document.getElementById('pendingSection').classList.add('hidden');
+            document.getElementById('approvedSection').classList.add('hidden');
+            document.getElementById('rejectedSection').classList.add('hidden');
+
+            document.getElementById(`${section}Section`).classList.remove('hidden');
+            applyFilters();
+        }
+
+        function displayApplications(applications) {
+            const pendingTbody = document.getElementById('pendingApplicationsBody');
+            const approvedTbody = document.getElementById('approvedApplicationsBody');
+            const rejectedTbody = document.getElementById('rejectedApplicationsBody');
+
+            pendingTbody.innerHTML = '';
+            approvedTbody.innerHTML = '';
+            rejectedTbody.innerHTML = '';
+
+            if (applications.length === 0) {
+                const noDataRowPending = '<tr><td colspan="9" class="p-3 text-center text-gray-500">No applications found.</td></tr>';
+                const noDataRowApproved = '<tr><td colspan="10" class="p-3 text-center text-gray-500">No applications found.</td></tr>';
+                const noDataRowRejected = '<tr><td colspan="9" class="p-3 text-center text-gray-500">No applications found.</td></tr>';
+                pendingTbody.innerHTML = noDataRowPending;
+                approvedTbody.innerHTML = noDataRowApproved;
+                rejectedTbody.innerHTML = noDataRowRejected;
+                return;
+            }
+
+            applications.forEach(app => {
+                console.log(`Processing application ID ${app.id}: status=${app.status}, offer_letter_path=${app.offer_letter_path}`);
+                const row = document.createElement('tr');
+                row.className = 'border-b';
+                
+                // Function to truncate text
+                const truncateText = (text, maxLength = 20) => {
+                    if (!text) return '-';
+                    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+                };
+
+                // Base row content for Pending and Rejected
+                let rowContent = `
+                    <td class="p-3">${app.reference_id || '-'}</td>
+                    <td class="p-3 truncate-cell" title="${app.full_name || ''}">${truncateText(app.full_name)}</td>
+                    <td class="p-3 truncate-cell" title="${app.email || ''}">${truncateText(app.email)}</td>
+                    <td class="p-3">${app.mobile_number || '-'}</td>
+                    <td class="p-3 truncate-cell" title="${app.department || ''}">${truncateText(app.department)}</td>
+                    <td class="p-3 truncate-cell" title="${app.job_role || ''}">${truncateText(app.job_role)}</td>
+                    <td class="p-3">
+                        <span class="${
+                            app.status === 'Pending' ? 'text-yellow-500' :
+                            app.status === 'Approved' ? 'text-green-500' :
+                            'text-red-500'
+                        } font-medium">${app.status || 'Pending'}</span>
+                    </td>
+                    <td class="p-3">${formatDateTime(app.created_at)}</td>
+                    <td class="p-3">
+                        <button class="gradient-button text-white px-3 py-1 rounded-lg" onclick="viewDetails(${app.id})">View Details</button>
+                    </td>
+                `;
+
+                if (app.status === 'Pending') {
+                    row.innerHTML = rowContent;
+                    pendingTbody.appendChild(row.cloneNode(true));
+                } else if (app.status === 'Rejected') {
+                    row.innerHTML = rowContent;
+                    rejectedTbody.appendChild(row.cloneNode(true));
+                } else if (app.status === 'Approved') {
+                    // Extended row for Approved with Offer Letter column
+                    row.innerHTML = `
+                        <td class="p-3">${app.reference_id || '-'}</td>
+                        <td class="p-3 truncate-cell" title="${app.full_name || ''}">${truncateText(app.full_name)}</td>
+                        <td class="p-3 truncate-cell" title="${app.email || ''}">${truncateText(app.email)}</td>
+                        <td class="p-3">${app.mobile_number || '-'}</td>
+                        <td class="p-3 truncate-cell" title="${app.department || ''}">${truncateText(app.department)}</td>
+                        <td class="p-3 truncate-cell" title="${app.job_role || ''}">${truncateText(app.job_role)}</td>
+                        <td class="p-3">
+                            <span class="text-green-500 font-medium">${app.status}</span>
+                        </td>
+                        <td class="p-3">
+                            ${app.offer_letter_path 
+                                ? '<span class="text-blue-500 font-medium">Provided</span>' 
+                                : '<span class="text-gray-500">Not Provided</span>'}
+                        </td>
+                        <td class="p-3">${formatDateTime(app.created_at)}</td>
+                        <td class="p-3">
+                            <button class="gradient-button text-white px-3 py-1 rounded-lg" onclick="viewDetails(${app.id})">View Details</button>
+                        </td>
+                    `;
+                    approvedTbody.appendChild(row.cloneNode(true));
+                }
+            });
+        }
+
+        async function viewDetails(id) {
+            try {
+                console.log(`Fetching details for application ID ${id} from: ${BASE_URL}/api/applications/${id}`);
+                const response = await fetch(`${BASE_URL}/api/applications/${id}`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                console.log('Fetch details response status:', response.status, response.statusText);
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Fetch details error response:', errorText);
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+                const result = await response.json();
+                console.log('Parsed details response:', result);
+                if (!result.success) throw new Error(result.message);
+                currentApplicationId = id;
+                console.log(`HR side referenceId for app ${id} (details view): ${result.data.reference_id}`);
+                showApplicationDetails(result.data);
+            } catch (error) {
+                console.error('Fetch details error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error Fetching Details',
+                    text: error.message.includes('Failed to fetch')
+                        ? 'Unable to connect to the server. Please ensure the server is running.'
+                        : error.message.includes('CORS')
+                        ? 'CORS error: Please ensure the server allows requests from this origin.'
+                        : error.message
+                });
+            }
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const date = new Date(dateStr);
+            return isNaN(date.getTime()) ? '-' : date.toLocaleDateString('en-GB');
+        }
+
+        function formatDateTime(dateStr) {
+            if (!dateStr) return '-';
+            const date = new Date(dateStr);
+            return isNaN(date.getTime()) ? '-' : date.toLocaleString('en-GB');
+        }
+
+        function displayValue(value) {
+            return value || value === 0 ? value : '-';
+        }
+
+        function showApplicationDetails(data) {
+            const detailsDiv = document.getElementById('applicationDetails');
+            const documentsDiv = document.getElementById('documentLinks');
+            const statusSelect = document.getElementById('statusSelect');
+            const offerLetterSection = document.getElementById('offerLetterUploadSection');
+            const statusSection = document.getElementById('statusSection');
+
+            detailsDiv.innerHTML = `
+                <div class="mb-2"><strong class="w-48 inline-block text-gray-600">Reference ID:</strong> <span>${displayValue(data.reference_id)}</span></div>
+                <div class="mb-2"><strong class="w-48 inline-block text-gray-600">Full Name:</strong> <span>${displayValue(data.full_name)}</span></div>
+                <div class="mb-2"><strong class="w-48 inline-block text-gray-600">Email:</strong> <span>${displayValue(data.email)}</span></div>
+                <div class="mb-2"><strong class="w-48 inline-block text-gray-600">Mobile Number:</strong> <span>${displayValue(data.mobile_number)}</span></div>
+                <div class="mb-2"><strong class="w-48 inline-block text-gray-600">Department:</strong> <span>${displayValue(data.department)}</span></div>
+                <div class="mb-2"><strong class="w-48 inline-block text-gray-600">Job Role:</strong> <span>${displayValue(data.job_role)}</span></div>
+                <div class="mb-2"><strong class="w-48 inline-block text-gray-600">Date of Birth:</strong> <span>${formatDate(data.dob)}</span></div>
+                <div class="mb-2"><strong class="w-48 inline-block text-gray-600">Father's Name:</strong> <span>${displayValue(data.father_name)}</span></div>
+                <div class="mb-2"><strong class="w-48 inline-block text-gray-600">Permanent Address:</strong> <span>${displayValue(data.permanent_address)}</span></div>
+                <div class="mb-2"><strong class="w-48 inline-block text-gray-600">Expected Salary:</strong> <span>${data.expected_salary ? '₹' + parseInt(data.expected_salary).toLocaleString('en-IN') : '-'}</span></div>
+                <div class="mb-2"><strong class="w-48 inline-block text-gray-600">Interview Date:</strong> <span>${formatDate(data.interview_date)}</span></div>
+                <div class="mb-2"><strong class="w-48 inline-block text-gray-600">Joining Date:</strong> <span>${displayValue(data.joining_date)}</span></div>
+                <div class="mb-2"><strong class="w-48 inline-block text-gray-600">Employment Type:</strong> <span>${displayValue(data.employment_type)}</span></div>
+                <div class="mb-2"><strong class="w-48 inline-block text-gray-600">Branch Location:</strong> <span>${displayValue(data.branch_location)}</span></div>
+                <div class="mb-2"><strong class="w-48 inline-block text-gray-600">SSC Year:</strong> <span>${displayValue(data.ssc_year)}</span></div>
+                <div class="mb-2"><strong class="w-48 inline-block text-gray-600">SSC Percentage/CGPA:</strong> <span>${displayValue(data.ssc_percentage)}</span></div>
+                <div class="mb-2"><strong class="w-48 inline-block text-gray-600">Intermediate Year:</strong> <span>${displayValue(data.intermediate_year)}</span></div>
+                <div class="mb-2"><strong class="w-48 inline-block text-gray-600">Intermediate Percentage/CGPA:</strong> <span>${displayValue(data.intermediate_percentage)}</span></div>
+                <div class="mb-2"><strong class="w-48 inline-block text-gray-600">College/University:</strong> <span>${displayValue(data.college_name)}</span></div>
+                <div class="mb-2"><strong class="w-48 inline-block text-gray-600">Registration Number:</strong> <span>${displayValue(data.register_number)}</span></div>
+                <div class="mb-2"><strong class="w-48 inline-block text-gray-600">Graduation Year:</strong> <span>${displayValue(data.graduation_year)}</span></div>
+                <div class="mb-2"><strong class="w-48 inline-block text-gray-600">Graduation Percentage/CGPA:</strong> <span>${displayValue(data.graduation_percentage)}</span></div>
+                <div class="mb-2"><strong class="w-48 inline-block text-gray-600">Additional Certifications:</strong> <span>${displayValue(data.additional_certifications)}</span></div>
+                <div class="mb-2"><strong class="w-48 inline-block text-gray-600">Experience Status:</strong> <span>${displayValue(data.experience_status)}</span></div>
+                <div class="mb-2"><strong class="w-48 inline-block text-gray-600">Years of Experience:</strong> <span>${displayValue(data.years_of_experience)}</span></div>
+                <div class="mb-2"><strong class="w-48 inline-block text-gray-600">Previous Company:</strong> <span>${displayValue(data.previous_company)}</span></div>
+                <div class="mb-2"><strong class="w-48 inline-block text-gray-600">Previous Job Role:</strong> <span>${displayValue(data.previous_job_role)}</span></div>
+                <div class="mb-2"><strong class="w-48 inline-block text-gray-600">Applied On:</strong> <span>${formatDateTime(data.created_at)}</span></div>
+            `;
+
+            documentsDiv.innerHTML = `
+                <div class="mb-2">
+                    <strong class="w-48 inline-block text-gray-600">SSC Document:</strong>
+                    ${data.ssc_doc_path 
+                        ? `<a href="${BASE_URL}/Uploads/${data.ssc_doc_path}" class="bg-green-500 text-white px-3 py-1 rounded-lg hover:bg-green-600 transition" download>Download SSC</a>`
+                        : '<span>No file uploaded</span>'}
+                </div>
+                <div class="mb-2">
+                    <strong class="w-48 inline-block text-gray-600">Intermediate Document:</strong>
+                    ${data.intermediate_doc_path 
+                        ? `<a href="${BASE_URL}/Uploads/${data.intermediate_doc_path}" class="bg-green-500 text-white px-3 py-1 rounded-lg hover:bg-green-600 transition" download>Download Intermediate</a>`
+                        : '<span>No file uploaded</span>'}
+                </div>
+                <div class="mb-2">
+                    <strong class="w-48 inline-block text-gray-600">Graduation Document:</strong>
+                    ${data.graduation_doc_path 
+                        ? `<a href="${BASE_URL}/Uploads/${data.graduation_doc_path}" class="bg-green-500 text-white px-3 py-1 rounded-lg hover:bg-green-600 transition" download>Download Graduation</a>`
+                        : '<span>No file uploaded</span>'}
+                </div>
+                <div class="mb-2">
+                    <strong class="w-48 inline-block text-gray-600">Additional Document:</strong>
+                    ${data.additional_files_path 
+                        ? `<a href="${BASE_URL}/Uploads/${data.additional_files_path}" class="bg-green-500 text-white px-3 py-1 rounded-lg hover:bg-green-600 transition" download>Download Additional</a>`
+                        : '<span>No file uploaded</span>'}
+                </div>
+                <div class="mb-2">
+                    <strong class="w-48 inline-block text-gray-600">Offer Letter:</strong>
+                    ${data.offer_letter_path 
+                        ? `<a href="${BASE_URL}/Uploads/${data.offer_letter_path}" class="bg-green-500 text-white px-3 py-1 rounded-lg hover:bg-green-600 transition" download>Download Offer Letter</a>`
+                        : '<span>No offer letter uploaded</span>'}
+                </div>
+            `;
+
+            statusSelect.value = data.status || 'Pending';
+            offerLetterSection.style.display = data.status === 'Approved' && !data.offer_letter_path ? 'block' : 'none';
+            statusSection.style.display = data.status === 'Pending' ? 'block' : 'none';
+            document.getElementById('detailsModal').classList.remove('hidden');
+        }
+
+        function confirmStatusUpdate() {
+            const status = document.getElementById('statusSelect').value;
+            Swal.fire({
+                title: `Are you sure?`,
+                text: `You are about to mark this application as ${status}. This action cannot be undone.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, update it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    updateStatus();
+                }
+            });
+        }
+
+        async function updateStatus() {
+            const status = document.getElementById('statusSelect').value;
+            if (!currentApplicationId) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'No application selected'
+                });
+                return;
+            }
+
+            try {
+                console.log(`Updating status for application ID ${currentApplicationId} to ${status}`);
+                const response = await fetch(`${BASE_URL}/api/applications/${currentApplicationId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status })
+                });
+                console.log('Update status response status:', response.status, response.statusText);
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Update status error response:', errorText);
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+                const result = await response.json();
+                console.log('Update status response:', result);
+                if (!result.success) throw new Error(result.message);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: 'Status updated successfully!'
+                });
+                closeModal();
+                fetchApplications();
+            } catch (error) {
+                console.error('Update status error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error Updating Status',
+                    text: error.message.includes('Failed to fetch')
+                        ? 'Unable to connect to the server. Please ensure the server is running.'
+                        : error.message.includes('CORS')
+                        ? 'CORS error: Please ensure the server allows requests from this origin.'
+                        : error.message
+                });
+            }
+        }
+
+        async function uploadOfferLetter() {
+            const fileInput = document.getElementById('offerLetterInput');
+            if (!fileInput.files[0]) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Please select a file to upload'
+                });
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('offerLetter', fileInput.files[0]);
+
+            try {
+                console.log(`Uploading offer letter for application ID ${currentApplicationId}`);
+                const response = await fetch(`${BASE_URL}/api/applications/${currentApplicationId}/offer-letter`, {
+                    method: 'POST',
+                    body: formData
+                });
+                console.log('Upload offer letter response status:', response.status, response.statusText);
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Upload offer letter error response:', errorText);
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+                const result = await response.json();
+                console.log('Upload offer letter response:', result);
+                if (!result.success) throw new Error(result.message);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: 'Offer letter uploaded successfully!'
+                });
+                closeModal();
+                fetchApplications();
+            } catch (error) {
+                console.error('Upload offer letter error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error Uploading Offer Letter',
+                    text: error.message.includes('Failed to fetch')
+                        ? 'Unable to connect to the server. Please ensure the server is running.'
+                        : error.message.includes('CORS')
+                        ? 'CORS error: Please ensure the server allows requests from this origin.'
+                        : error.message
+                });
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('detailsModal').classList.add('hidden');
+            document.getElementById('applicationDetails').innerHTML = '';
+            document.getElementById('documentLinks').innerHTML = '';
+            document.getElementById('offerLetterUploadSection').style.display = 'none';
+            document.getElementById('statusSection').style.display = 'block';
+            currentApplicationId = null;
+        }
+
+        // Event Listeners for Filters
+        document.getElementById('searchInput').addEventListener('input', applyFilters);
+        document.getElementById('departmentFilter').addEventListener('change', applyFilters);
+        document.getElementById('jobRoleFilter').addEventListener('change', applyFilters);
+    </script>
+</body>
+</html>

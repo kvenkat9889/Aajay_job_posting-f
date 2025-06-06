@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Offer Letter</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="icon" type="image/png" href="https://favicon.io/favicon-16x16.png">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background-color: #F3F4F6;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .header {
+            position: relative;
+            background: linear-gradient(to right, #7C3AED, #3B82F6);
+            color: #FFFFFF;
+            padding: 2rem;
+            text-align: center;
+            border-bottom-left-radius: 1.5rem;
+            border-bottom-right-radius: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header .circle-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+            opacity: 0.2;
+        }
+
+        .circle {
+            position: absolute;
+            background-color: #FFFFFF;
+            border-radius: 50%;
+            animation: pulse 10s infinite linear;
+        }
+
+        .circle:nth-child(1) {
+            width: 12rem;
+            height: 12rem;
+            top: 2.5rem;
+            left: 5rem;
+        }
+
+        .circle:nth-child(2) {
+            width: 16rem;
+            height: 16rem;
+            top: 10rem;
+            right: 5rem;
+        }
+
+        .header h1 {
+            font-size: 2.25rem;
+            font-weight: bold;
+            position: relative;
+            z-index: 10;
+        }
+
+        .header p {
+            font-size: 1.125rem;
+            margin-top: 0.5rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #FFFFFF;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #4B5563;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #D1D5DB;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .submit-button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            background-color: #3B82F6;
+            color: #FFFFFF;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+
+        .submit-button:hover {
+            background-color: #2563EB;
+        }
+
+        .result-section {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .result-section .no-offer {
+            color: #EF4444;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .result-section .no-offer i {
+            margin-right: 0.5rem;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .view-button, .download-button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            color: #FFFFFF;
+            transition: background-color 0.3s;
+        }
+
+        .view-button {
+            background-color: #3B82F6;
+        }
+
+        .view-button:hover {
+            background-color: #2563EB;
+        }
+
+        .download-button {
+            background-color: #10B981;
+        }
+
+        .download-button:hover {
+            background-color: #059669;
+        }
+
+        @keyframes pulse {
+            0% { transform: translate(0, 0); }
+            50% { transform: translate(-50px, -50px); }
+            100% { transform: translate(0, 0); }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.875rem;
+            }
+
+            .header p {
+                font-size: 1rem;
+            }
+
+            .container {
+                padding: 1.5rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .view-button, .download-button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="circle-container">
+            <div class="circle"></div>
+            <div class="circle"></div>
+        </div>
+        <h1>Access Offer Letter</h1>
+        <p>Enter your details to view or download your offer letter</p>
+    </div>
+
+    <div class="container">
+        <div class="form-group">
+            <label for="referenceId">Reference ID</label>
+            <input type="text" id="referenceId" placeholder="Enter Reference ID">
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="Enter Email">
+        </div>
+        <button class="submit-button" onclick="checkOfferLetter()">Check Offer Letter</button>
+
+        <div class="result-section" id="resultSection" style="display: none;">
+            <div id="resultMessage"></div>
+            <div id="buttonGroup" class="button-group"></div>
+        </div>
+    </div>
+
+    <script>
+    const BASE_URL = 'http://54.166.206.245:3222';
+const resultSection = document.getElementById('resultSection');
+const resultMessage = document.getElementById('resultMessage');
+const buttonGroup = document.getElementById('buttonGroup');
+
+async function checkOfferLetter() {
+    const referenceId = document.getElementById('referenceId').value.trim();
+    const email = document.getElementById('email').value.trim();
+
+    if (!referenceId || !email) {
+        alert('Please enter both Reference ID and Email');
+        return;
+    }
+
+    try {
+        const response = await fetch(`${BASE_URL}/api/applications?reference_id=${referenceId}&email=${email}`);
+        const result = await response.json();
+        
+        if (!response.ok) throw new Error(result.message || 'Application not found');
+        if (!result.data || result.data.length === 0) throw new Error('Application not found');
+        
+        const application = result.data[0];
+        if (application.status !== 'Approved') throw new Error('Your application is not yet approved');
+        if (!application.offer_letter) throw new Error('No offer letter available yet');
+
+        showOfferLetterOptions(application.offer_letter.split('/').pop());
+    } catch (error) {
+        showError(error.message);
+        console.error('Check error:', error);
+    }
+}
+
+function showOfferLetterOptions(filename) {
+    resultSection.style.display = 'block';
+    resultMessage.innerHTML = '<p class="text-green-500">Offer letter available!</p>';
+    buttonGroup.innerHTML = `
+        <button onclick="viewOfferLetter('${filename}')" class="bg-blue-500 text-white px-4 py-2 rounded mr-2">
+            <i class="fas fa-eye mr-2"></i>View
+        </button>
+        <button onclick="downloadOfferLetter('${filename}')" class="bg-green-500 text-white px-4 py-2 rounded">
+            <i class="fas fa-download mr-2"></i>Download
+        </button>
+    `;
+}
+
+function viewOfferLetter(filename) {
+    window.open(`${BASE_URL}/uploads/${filename}`, '_blank');
+}
+
+function downloadOfferLetter(filename) {
+    const link = document.createElement('a');
+    link.href = `${BASE_URL}/uploads/${filename}`;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function showError(message) {
+    resultSection.style.display = 'block';
+    resultMessage.innerHTML = `
+        <p class="text-red-500">
+            <i class="fas fa-exclamation-circle mr-2"></i>${message}
+        </p>
+    `;
+    buttonGroup.innerHTML = '';
+}
+    </script>
+</body>
+</html>
