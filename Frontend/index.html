@@ -516,7 +516,8 @@
         </div>
 
         <div class="form-container">
-            <form id="offerLetterForm" enctype="multipart/form-data">
+            
+                <form id="applicationForm" enctype="multipart/form-data">
                 <!-- Section 1: Job Details -->
                 <div id="jobDetails" class="form-section active">
                     <div class="two-columns">
@@ -815,7 +816,7 @@
 
                     <div class="form-group">
                         <label for="additionalFiles">Upload Additional Documents (if any)</label>
-                        <input type="file" id="additionalFiles" name="additional_files" accept=".pdf">
+                        <input type="file" id="additionalFiles" name="additionalFiles" accept=".pdf">
                         <div class="error-message" id="additionalFilesError"></div>
                     </div>
 
@@ -916,7 +917,7 @@
         const joiningDateOptions = document.querySelectorAll('.joining-option');
         const successModal = document.getElementById('successModal');
         const refIdDisplay = document.getElementById('refIdDisplay');
-        const BASE_URL = 'http://54.166.206.245:3222';
+        const BASE_URL = 'http://54.166.206.245:3222'; 
 
         // Initialize form
         document.addEventListener('DOMContentLoaded', function() {
@@ -987,7 +988,6 @@
                     const customContainer = document.getElementById('customJoiningDateContainer');
                     customContainer.style.display = value === 'custom' ? 'block' : 'none';
                     
-                    // Clear custom date if another option is selected
                     if (value !== 'custom') {
                         document.getElementById('customJoiningDate').value = '';
                     }
@@ -1134,7 +1134,7 @@
                         return false;
                     }
                     if (input.id === 'interviewDate' && !validateInterviewDate(input.value)) {
-                        showError(input, errorElement, 'Interview date must be within 6 months before today');
+                        showError(input, errorElement, 'Interview date must be within 6 months from today');
                         return false;
                     }
                     break;
@@ -1158,12 +1158,12 @@
                     }
                     if (input.id === 'permanentAddress') {
                         if (!validatePermanentAddress(input.value)) {
-                            showError(input, errorElement, 'Invalid address format!');
+                            showError(input, errorElement, 'Invalid format');
                             return false;
                         }
                     }
                     if (input.id === 'sscPercentage' || input.id === 'intermediatePercentage' || input.id === 'graduationPercentage') {
-                        if (!/^([1-9][0-9]?|100)(\.[0-9]{1,2})?$/.test(input.value)) {
+                        if (!/text/javascript.test(value)) {
                             showError(input, errorElement, 'Percentage must be between 1 and 100 with up to 2 decimal places (e.g., 85, 85.5, 85.67)');
                             return false;
                         }
@@ -1191,7 +1191,7 @@
             if (input.files.length) {
                 const file = input.files[0];
                 const validTypes = ['application/pdf'];
-                const maxSize = 5 * 1024 * 1024;
+                const maxSize = 5 * 1024 * 1024; // 5MB
                 if (!validTypes.includes(file.type)) {
                     showError(input, errorElement, 'Only PDF files are allowed');
                     return false;
@@ -1221,87 +1221,11 @@
         }
 
         function validateName(name) {
-            return /^(?!\s)(?!.*\s{2,})([A-Za-z]+(?: [A-Za-z]+)*[A-Za-z])$/.test(name);
+            return /^(?!\s)(?!.*\s{2,})([A-Za-z]+(?:\s[A-Za-z]+)*[A-Za-z])$/.test(name);
         }
 
-        function validatePermanentAddress(value) {
-            const regex = /^[a-zA-Z0-9]+(?:(?:[,\-\/:.][a-zA-Z0-9]*)|(?:\s[a-zA-Z0-9]+))*[a-zA-Z0-9]$/;
-            return regex.test(value);
-        }
-
-        function validateYearInput(input) {
-            const value = parseInt(input.value);
-            const currentYear = new Date().getFullYear();
-
-            if (isNaN(value) || value < 1985 || value > currentYear) {
-                showError(input, document.getElementById(`${input.id}Error`), `Year must be between 1985 and ${currentYear}.`);
-                return false;
-            }
-
-            const sscYear = document.getElementById("sscYear").value;
-            const interYear = document.getElementById("intermediateYear").value;
-            const gradYear = document.getElementById("graduationYear").value;
-
-            if (input.id === "intermediateYear" && sscYear && value <= parseInt(sscYear) + 1) {
-                showError(input, document.getElementById(`${input.id}Error`), "Intermediate year must be at least 2 years after SSC year.");
-                return false;
-            }
-
-            if (input.id === "graduationYear" && interYear && value <= parseInt(interYear) + 2) {
-                showError(input, document.getElementById(`${input.id}Error`), "Graduation year must be at least 3 years after Intermediate year.");
-                return false;
-            }
-
-            return true;
-        }
-
-        function restrictYearInputs() {
-            const yearInputs = document.querySelectorAll('input[id="sscYear"], input[id="intermediateYear"], input[id="graduationYear"]');
-
-            yearInputs.forEach(input => {
-                input.addEventListener('keydown', (e) => {
-                    if (!/[0-9]|Backspace|ArrowLeft|ArrowRight|ArrowUp|ArrowDown/.test(e.key)) {
-                        e.preventDefault();
-                    }
-                });
-
-                input.addEventListener('input', (e) => {
-                    if (input.value.length > 4) {
-                        input.value = input.value.slice(0, 4);
-                    }
-                    validateInput(input);
-                });
-            });
-        }
-
-        function restrictSalaryInput() {
-            const salaryInput = document.getElementById('expectedSalary');
-
-            if (salaryInput) {
-                salaryInput.addEventListener('input', (e) => {
-                    let value = salaryInput.value.replace(/\D/g, '');
-                    if (value.length > 8) {
-                        value = value.slice(0, 8);
-                    }
-                    salaryInput.value = value;
-                    validateInput(salaryInput);
-                });
-            }
-        }
-
-        function restrictExperienceInput() {
-            const experienceInput = document.getElementById('yearsOfExperience');
-
-            if (experienceInput) {
-                experienceInput.addEventListener('input', (e) => {
-                    let value = experienceInput.value.replace(/\D/g, '');
-                    if (value.length > 2) {
-                        value = value.slice(0, 2);
-                    }
-                    experienceInput.value = value;
-                    validateInput(experienceInput);
-                });
-            }
+        function validatePermanentAddress(address) {
+            return /^[a-zA-Z0-9\s,.-]{5,80}$/.test(address);
         }
 
         function validateDOB(dob) {
@@ -1320,85 +1244,129 @@
             if (!date) return false;
             const joiningDate = new Date(date);
             const today = new Date();
-            const fourMonthsLater = new Date();
-            fourMonthsLater.setMonth(today.getMonth() + 4);
-            return joiningDate >= today && joiningDate <= fourMonthsLater;
+            const maxDate = new Date(today.getFullYear(), today.getMonth() + 4, today.getDate());
+            return joiningDate >= today && joiningDate <= maxDate;
         }
 
         function validateInterviewDate(date) {
             if (!date) return false;
             const interviewDate = new Date(date);
             const today = new Date();
-            const sixMonthsEarlier = new Date();
-            sixMonthsEarlier.setMonth(today.getMonth() - 6);
-            return interviewDate >= sixMonthsEarlier && interviewDate <= today;
+            const minDate = new Date(today.getFullYear(), today.getMonth() - 6, today.getDate());
+            return interviewDate >= minDate && interviewDate <= today;
+        }
+
+        function validateYearInput(input) {
+            const value = parseInt(input.value);
+            const currentYear = new Date().getFullYear();
+            if (isNaN(value) || value < 1985 || value > currentYear) {
+                showError(input, document.getElementById(`${input.id}Error`), `Year must be between 1985 and ${currentYear}`);
+                return false;
+            }
+            const sscYear = parseInt(document.getElementById('sscYear').value || 0);
+            const intermediateYear = parseInt(document.getElementById('intermediateYear').value || 0);
+            const graduationYear = parseInt(document.getElementById('graduationYear').value || 0);
+
+            if (input.id === 'intermediateYear' && sscYear && value <= sscYear + 1) {
+                showError(input, document.getElementById(`${input.id}Error`), 'Intermediate year must be at least 2 years after SSC year');
+                return false;
+            }
+            if (input.id === 'graduationYear' && intermediateYear && value <= intermediateYear + 2) {
+                showError(input, document.getElementById(`${input.id}Error`), 'Graduation year must be at least 3 years after Intermediate year');
+                return false;
+            }
+            return true;
+        }
+
+        function restrictYearInputs() {
+            const yearInputs = document.querySelectorAll('#sscYear, #intermediateYear, #graduationYear');
+            yearInputs.forEach(input => {
+                input.addEventListener('keydown', (e) => {
+                    if (!/[0-9]|Backspace|ArrowLeft|ArrowRight|ArrowUp|ArrowDown/.test(e.key)) {
+                        e.preventDefault();
+                    }
+                });
+                input.addEventListener('input', () => {
+                    if (input.value.length > 4) {
+                        input.value = input.value.slice(0, 4);
+                    }
+                    validateInput(input);
+                });
+            });
+        }
+
+        function restrictSalaryInput() {
+            const salaryInput = document.getElementById('expectedSalary');
+            salaryInput.addEventListener('input', () => {
+                let value = salaryInput.value.replace(/\D/g, '');
+                if (value.length > 8) {
+                    value = value.slice(0, 8);
+                }
+                salaryInput.value = value;
+                validateInput(salaryInput);
+            });
+        }
+
+        function restrictExperienceInput() {
+            const experienceInput = document.getElementById('yearsOfExperience');
+            experienceInput.addEventListener('input', () => {
+                let value = experienceInput.value.replace(/\D/g, '');
+                if (value.length > 2) {
+                    value = value.slice(0, 2);
+                }
+                experienceInput.value = value;
+                validateInput(experienceInput);
+            });
         }
 
         function setDateConstraints() {
             const today = new Date();
-            const formatDate = (date) => date.toISOString().split('T')[0];
+            const minDob = new Date(today.getFullYear() - 60, today.getMonth(), today.getDate());
+            const maxDob = new Date(today.getFullYear() - 20, today.getMonth(), today.getDate());
+            document.getElementById('dob').setAttribute('min', minDob.toISOString().split('T')[0]);
+            document.getElementById('dob').setAttribute('max', maxDob.toISOString().split('T')[0]);
 
-            // DOB: 20-60 years old
-            const minDOB = new Date();
-            minDOB.setFullYear(today.getFullYear() - 60);
-            const maxDOB = new Date();
-            maxDOB.setFullYear(today.getFullYear() - 20);
-            document.getElementById('dob').setAttribute('max', formatDate(maxDOB));
-            document.getElementById('dob').setAttribute('min', formatDate(minDOB));
+            const minInterview = new Date(today.getFullYear(), today.getMonth() - 6, today.getDate());
+            const maxInterview = today;
+            document.getElementById('interviewDate').setAttribute('min', minInterview.toISOString().split('T')[0]);
+            document.getElementById('interviewDate').setAttribute('max', maxInterview.toISOString().split('T')[0]);
 
-            // Interview date: Up to 6 months ago
-            const minInterviewDate = new Date();
-            minInterviewDate.setMonth(today.getMonth() - 6);
-            document.getElementById('interviewDate').setAttribute('max', formatDate(today));
-            document.getElementById('interviewDate').setAttribute('min', formatDate(minInterviewDate));
-
-            // Joining date: Up to 4 months in future
-            const maxJoiningDate = new Date();
-            maxJoiningDate.setMonth(today.getMonth() + 4);
-            document.getElementById('customJoiningDate').setAttribute('min', formatDate(today));
-            document.getElementById('customJoiningDate').setAttribute('max', formatDate(maxJoiningDate));
+            const minJoining = today;
+            const maxJoining = new Date(today.getFullYear(), today.getMonth() + 4, today.getDate());
+            document.getElementById('customJoiningDate').setAttribute('min', minJoining.toISOString().split('T')[0]);
+            document.getElementById('customJoiningDate').setAttribute('max', maxJoining.toISOString().split('T')[0]);
         }
 
         function toggleExperienceFields() {
-            const experienceStatus = document.getElementById('experienceStatus');
-            const experienceFields = document.getElementById('experienceFields');
-            if (experienceStatus.value === 'experienced') {
-                experienceFields.style.display = 'block';
-                document.getElementById('yearsOfExperience').required = true;
-                document.getElementById('previousCompany').required = true;
-                document.getElementById('previousJobRole').required = true;
-            } else {
-                experienceFields.style.display = 'none';
-                document.getElementById('yearsOfExperience').required = false;
-                document.getElementById('previousCompany').required = false;
-                document.getElementById('previousJobRole').required = false;
-                
-                // Clear experience fields when switching to fresher
+            const status = document.getElementById('experienceStatus').value;
+            const fields = document.getElementById('experienceFields');
+            fields.style.display = status === 'experienced' ? 'block' : 'none';
+            if (status !== 'experienced') {
                 document.getElementById('yearsOfExperience').value = '';
                 document.getElementById('previousCompany').value = '';
                 document.getElementById('previousJobRole').value = '';
+            } else {
+                document.getElementById('yearsOfExperience').required = true;
+                document.getElementById('previousCompany').required = true;
+                document.getElementById('previousJobRole').required = true;
             }
         }
 
         async function submitForm() {
             if (isSubmitting) return;
             isSubmitting = true;
-            
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin btn-icon"></i> Submitting...';
 
-            const form = document.getElementById('offerLetterForm');
+            const form = document.getElementById('applicationForm');
             const formData = new FormData(form);
-
-            // Calculate joining date based on selection
-            const joiningOption = document.querySelector('input[name="joining_option"]:checked')?.value;
-            if (joiningOption) {
+            const joiningOption = document.querySelector('input[name="joining_option"]:checked').value;
+            if (joiningOption !== 'custom') {
+                const today = new Date();
                 let joiningDate = new Date();
-                if (joiningOption === 'custom') {
-                    joiningDate = new Date(document.getElementById('customJoiningDate').value);
-                } else if (joiningOption !== 'immediate') {
-                    joiningDate.setDate(joiningDate.getDate() + parseInt(joiningOption));
+                if (joiningOption !== 'immediate') {
+                    joiningDate.setDate(today.getDate() + parseInt(joiningOption));
                 }
                 formData.set('joining_date', joiningDate.toISOString().split('T')[0]);
             }
@@ -1406,70 +1374,60 @@
             try {
                 const response = await fetch(`${BASE_URL}/api/applications`, {
                     method: 'POST',
-                    body: formData
+                    body: formData,
                 });
-
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(errorText || 'Failed to submit application');
-                }
-
                 const result = await response.json();
-                if (!result.success) {
-                    throw new Error(result.message || 'Application submission failed');
-                }
 
-                showSuccessModal(result.reference_id);
-            } catch (error) {
-                console.error('Submission error:', error);
-                
-                let errorMessage = 'Failed to submit application';
-                if (error.message.includes('Email already exists')) {
-                    errorMessage = 'This email is already registered';
-                    document.getElementById('email').classList.add('has-error');
-                    document.getElementById('emailError').textContent = errorMessage;
-                    document.getElementById('emailError').style.display = 'block';
-                    currentSection = 1;
+                if (response.ok) {
+                    refIdDisplay.textContent = result.reference_id;
+                    successModal.style.display = 'flex';
+                    form.reset();
+                    currentSection = 0;
                     showSection(currentSection);
                     updateProgressSteps();
                     updateProgressBar();
-                } else if (error.message.includes('Mobile number already exists')) {
-                    errorMessage = 'This mobile number is already registered';
-                    document.getElementById('mobileNumber').classList.add('has-error');
-                    document.getElementById('mobileNumberError').textContent = errorMessage;
-                    document.getElementById('mobileNumberError').style.display = 'block';
-                    currentSection = 1;
-                    showSection(currentSection);
-                    updateProgressSteps();
-                    updateProgressBar();
+                    document.getElementById('customJoiningDateContainer').style.display = 'none';
+                    joiningDateOptions.forEach(opt => opt.classList.remove('selected'));
+                    document.getElementById('experienceFields').style.display = 'none';
                 } else {
-                    alert(`Error: ${error.message || 'Failed to submit application'}`);
+                    let errorMessage = result.error || 'Failed to submit application';
+                    if (result.error === 'Email already exists') {
+                        document.getElementById('emailError').textContent = errorMessage;
+                        document.getElementById('emailError').style.display = 'block';
+                        document.getElementById('email').classList.add('has-error');
+                        currentSection = 1;
+                        showSection(currentSection);
+                        updateProgressSteps();
+                        updateProgressBar();
+                    } else if (result.error === 'Mobile number already exists') {
+                        document.getElementById('mobileNumberError').textContent = errorMessage;
+                        document.getElementById('mobileNumberError').style.display = 'block';
+                        document.getElementById('mobileNumber').classList.add('has-error');
+                        currentSection = 1;
+                        showSection(currentSection);
+                        updateProgressSteps();
+                        updateProgressBar();
+                    } else if (result.error.includes('Missing required fields')) {
+                        alert(`Error: ${errorMessage}\nMissing fields: ${result.missing.join(', ')}`);
+                    } else if (result.error === 'Only PDF, JPEG, JPG, and PNG files are allowed') {
+                        alert('Please upload only PDF files for required documents');
+                    } else {
+                        alert(`Error: ${errorMessage}`);
+                    }
                 }
+            } catch (error) {
+                console.error('Form submission error:', error);
+                alert('Network error: Unable to connect to the server. Please check your connection and try again.');
             } finally {
                 isSubmitting = false;
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Application';
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane btn-icon"></i> Submit Application';
             }
-        }
-
-        function showSuccessModal(refId) {
-            refIdDisplay.textContent = refId;
-            successModal.style.display = 'flex';
         }
 
         function closeModal() {
             successModal.style.display = 'none';
-            document.getElementById('offerLetterForm').reset();
-            currentSection = 0;
-            showSection(currentSection);
-            updateProgressSteps();
-            updateProgressBar();
-            document.querySelectorAll('.joining-option').forEach(opt => opt.classList.remove('selected'));
-            document.getElementById('customJoiningDateContainer').style.display = 'none';
-            
-            // Reset experience fields
-            document.getElementById('experienceStatus').value = '';
-            toggleExperienceFields();
+            window.location.reload();
         }
     </script>
 </body>

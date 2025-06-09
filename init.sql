@@ -1,6 +1,11 @@
+-- Drop existing objects to ensure a clean setup
+DROP TABLE IF EXISTS job_applications;
+DROP TYPE IF EXISTS application_status;
+DROP ROLE IF EXISTS app_user;
+
 -- Create application user with limited privileges
 CREATE ROLE app_user WITH LOGIN PASSWORD 'admin123';
-GRANT CONNECT ON DATABASE new_employee_db TO app_user;
+GRANT CONNECT ON DATABASE new_employee_db_offer TO app_user;
 GRANT USAGE ON SCHEMA public TO app_user;
 
 -- Create status enum type for better data integrity
@@ -11,8 +16,8 @@ CREATE TABLE IF NOT EXISTS job_applications (
     id SERIAL PRIMARY KEY,
     reference_id VARCHAR(50) UNIQUE NOT NULL,
     full_name VARCHAR(100) NOT NULL,
-    email VARCHAR(100) NOT NULL,
-    mobile_number VARCHAR(80) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    mobile_number VARCHAR(80) NOT NULL UNIQUE,
     department VARCHAR(90) NOT NULL,
     job_role VARCHAR(90) NOT NULL,
     dob DATE,
@@ -69,11 +74,3 @@ EXECUTE FUNCTION update_timestamp();
 GRANT SELECT, INSERT, UPDATE ON job_applications TO app_user;
 GRANT USAGE, SELECT ON SEQUENCE job_applications_id_seq TO app_user;
 
--- Add sample data for testing
-INSERT INTO job_applications (
-    reference_id, full_name, email, mobile_number, department, job_role,
-    status, created_at
-) VALUES (
-    'REF123456789', 'John Doe', 'john.doe@example.com', '9876543210',
-    'Engineering', 'Software Developer', 'Approved', CURRENT_TIMESTAMP
-);

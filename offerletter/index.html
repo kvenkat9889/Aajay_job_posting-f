@@ -126,13 +126,19 @@
             text-align: center;
         }
 
-        .result-section .no-offer {
+        .result-section .error {
             color: #EF4444;
             font-size: 1.25rem;
             font-weight: 600;
         }
 
-        .result-section .no-offer i {
+        .result-section .success {
+            color: #10B981;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .result-section i {
             margin-right: 0.5rem;
         }
 
@@ -151,6 +157,9 @@
             cursor: pointer;
             color: #FFFFFF;
             transition: background-color 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
         }
 
         .view-button {
@@ -211,11 +220,12 @@
     <div class="container">
         <div class="form-group">
             <label for="referenceId">Reference ID</label>
-            <input type="text" id="referenceId" placeholder="Enter Reference ID">
+            <input type="text" id="referenceId" placeholder="Enter Reference ID" required>
         </div>
+
         <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" placeholder="Enter Email">
+            <label for="email">Email ID</label>
+            <input type="email" id="email" placeholder="Enter Email ID" required>
         </div>
         <button class="submit-button" onclick="checkOfferLetter()">Check Offer Letter</button>
 
@@ -226,73 +236,106 @@
     </div>
 
     <script>
-    const BASE_URL = 'http://54.166.206.245:3222';
-const resultSection = document.getElementById('resultSection');
-const resultMessage = document.getElementById('resultMessage');
-const buttonGroup = document.getElementById('buttonGroup');
+        const BASE_URL = 'http://54.166.206.245:3222';
+        const resultSection = document.getElementById('resultSection');
+        const resultMessage = document.getElementById('resultMessage');
+        const buttonGroup = document.getElementById('buttonGroup');
 
-async function checkOfferLetter() {
-    const referenceId = document.getElementById('referenceId').value.trim();
-    const email = document.getElementById('email').value.trim();
+        // Validate inputs
+        function validateInputs(referenceId, email) {
+            if (!referenceId || !email) {
+                return 'Please enter both Reference ID and Email ID';
+            }
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                return 'Please enter a valid Email ID';
+            }
+            return '';
+        }
 
-    if (!referenceId || !email) {
-        alert('Please enter both Reference ID and Email');
-        return;
-    }
+        // Fetch with retry logic
+        async function fetchWithRetry(url, options, retries = 3, delay = 1000) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    return response;
+                } catch (error) {
+                    if (i === retries - 1) throw error;
+                    console.warn(`Retrying (${i + 1}/${retries})...`);
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+            }
+        }
 
-    try {
-        const response = await fetch(`${BASE_URL}/api/applications?reference_id=${referenceId}&email=${email}`);
-        const result = await response.json();
-        
-        if (!response.ok) throw new Error(result.message || 'Application not found');
-        if (!result.data || result.data.length === 0) throw new Error('Application not found');
-        
-        const application = result.data[0];
-        if (application.status !== 'Approved') throw new Error('Your application is not yet approved');
-        if (!application.offer_letter) throw new Error('No offer letter available yet');
+        async function checkOfferLetter() {
+            const referenceId = document.getElementById('referenceId').value.trim();
+            const email = document.getElementById('email').value.trim();
 
-        showOfferLetterOptions(application.offer_letter.split('/').pop());
-    } catch (error) {
-        showError(error.message);
-        console.error('Check error:', error);
-    }
-}
+            const validationError = validateInputs(referenceId, email);
+            if (validationError) {
+                showError(validationError);
+                return;
+            }
 
-function showOfferLetterOptions(filename) {
-    resultSection.style.display = 'block';
-    resultMessage.innerHTML = '<p class="text-green-500">Offer letter available!</p>';
-    buttonGroup.innerHTML = `
-        <button onclick="viewOfferLetter('${filename}')" class="bg-blue-500 text-white px-4 py-2 rounded mr-2">
-            <i class="fas fa-eye mr-2"></i>View
-        </button>
-        <button onclick="downloadOfferLetter('${filename}')" class="bg-green-500 text-white px-4 py-2 rounded">
-            <i class="fas fa-download mr-2"></i>Download
-        </button>
-    `;
-}
+            try {
+                const response = await fetchWithRetry(`${BASE_URL}/api/applications?reference_id=${encodeURIComponent(referenceId)}&email=${encodeURIComponent(email)}`, {
+                    method: 'GET'
+                });
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(errorText || `HTTP error: ${response.status}`);
+                }
 
-function viewOfferLetter(filename) {
-    window.open(`${BASE_URL}/uploads/${filename}`, '_blank');
-}
+                const result = await response.json();
+                if (!result.success || !result.data || result.data.length === 0) {
+                    throw new Error('Application not found');
+                }
 
-function downloadOfferLetter(filename) {
-    const link = document.createElement('a');
-    link.href = `${BASE_URL}/uploads/${filename}`;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
+                const application = result.data[0];
+                if (application.status !== 'Approved') {
+                    throw new Error('Your application is not approved');
+                }
+                if (!application.offer_letter_path) {
+                    throw new Error('No offer letter available');
+                }
 
-function showError(message) {
-    resultSection.style.display = 'block';
-    resultMessage.innerHTML = `
-        <p class="text-red-500">
-            <i class="fas fa-exclamation-circle mr-2"></i>${message}
-        </p>
-    `;
-    buttonGroup.innerHTML = '';
-}
+                showOfferLetter(application.offer_letter_path);
+            } catch (error) {
+                showError(error.message || 'Failed to fetch offer letter');
+                console.error('Error checking offer letter:', error);
+            }
+        }
+
+        function showOfferLetter(offerLetterPath) {
+            const filename = offerLetterPath.split('/').pop();
+            resultSection.style.display = 'block';
+            resultMessage.innerHTML = '<p class="success"><i class="fas fa-check-circle"></i> Offer letter available!</p>';
+            buttonGroup.innerHTML = `
+                <a href="#" class="view-button" onclick="viewOfferLetter('${filename}')"><i class="fas fa-eye"></i> View</a>
+                <a href="#" class="download-button" onclick="downloadOfferLetter('${filename}')"><i class="fas fa-download"></i> Download</a>
+            `;
+        }
+
+        function viewOfferLetter(filename) {
+            window.open(`${BASE_URL}/Uploads/${filename}`, '_blank');
+        }
+
+        function downloadOfferLetter(filename) {
+            const link = document.createElement('a');
+            link.href = `${BASE_URL}/Uploads/${filename}`;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function showError(message) {
+            resultSection.style.display = 'block';
+            resultMessage.innerHTML = `
+                <p class="error"><i class="fas fa-exclamation-circle"></i> ${message}</p>
+            `;
+            buttonGroup.innerHTML = '';
+        }
     </script>
 </body>
 </html>
